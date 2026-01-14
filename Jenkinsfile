@@ -7,6 +7,13 @@ pipeline {
     }
 
     stages {
+         stage('Preparar Sistema') {
+            steps {
+                // Instala la librería del sistema faltante (para Debian/Ubuntu)
+                sh 'sudo apt-get update && sudo apt-get install -y libatomic1'
+            }
+        }
+        
         stage('Instalar dependencias') {
             steps {
                 sh 'npm install'

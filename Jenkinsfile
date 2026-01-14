@@ -9,9 +9,23 @@ pipeline {
     stages {
          stage('Preparar Sistema') {
             steps {
-                // Instala la librería del sistema faltante (para Debian/Ubuntu)
-                sh 'sudo apt-get update && sudo apt-get install -y libatomic1'
-            }
+        sh '''
+            # Detectar el sistema operativo y instalar libatomic
+            if command -v apk > /dev/null 2>&1; then
+                echo "Sistema Alpine. Instalando libatomic..."
+                apk add --no-cache libatomic
+            elif command -v apt-get > /dev/null 2>&1; then
+                echo "Sistema Debian/Ubuntu. Instalando libatomic1..."
+                apt-get update && apt-get install -y libatomic1
+            elif command -v yum > /dev/null 2>&1; then
+                echo "Sistema RHEL/CentOS. Instalando libatomic..."
+                yum install -y libatomic
+            else
+                echo "ERROR: No se pudo identificar el gestor de paquetes."
+                exit 1
+            fi
+        '''
+    }
         }
         
         stage('Instalar dependencias') {
